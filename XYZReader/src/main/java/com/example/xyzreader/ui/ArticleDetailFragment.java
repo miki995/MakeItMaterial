@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
@@ -70,7 +71,8 @@ public class ArticleDetailFragment extends Fragment implements
     View mPhotoContainerView;
     @BindView(R.id.thumbnail)
     ImageView mPhotoView;
-    @Nullable @BindView(R.id.parallax_bar)
+    @Nullable
+    @BindView(R.id.parallax_bar)
     AppBarLayout parallaxBar;
     @BindView(R.id.share_fab)
     FloatingActionButton mShareFab;
@@ -137,7 +139,7 @@ public class ArticleDetailFragment extends Fragment implements
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
         ButterKnife.bind(this, mRootView);
 
@@ -207,12 +209,6 @@ public class ArticleDetailFragment extends Fragment implements
                 }
             });
 
-            /*
-            Glide.with(getActivity())
-                    .load(photo)
-                    .into(mPhotoView);
-            */
-
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(photo, new ImageLoader.ImageListener() {
                         @Override
@@ -226,7 +222,7 @@ public class ArticleDetailFragment extends Fragment implements
                                 Palette p = Palette.from(bitmap).generate();
                                 mMutedColor = p.getDarkMutedColor(0xFF424242);
                                 mPhotoView.setImageBitmap(imageContainer.getBitmap());
-                                if (parallaxBar != null){
+                                if (parallaxBar != null) {
                                     metaBar.setBackgroundColor(mMutedColor);
                                 }
                             }
@@ -241,7 +237,7 @@ public class ArticleDetailFragment extends Fragment implements
         } else {
             mRootView.setVisibility(View.GONE);
             titleView.setText("N/A");
-            bylineView.setText("N/A" );
+            bylineView.setText("N/A");
             bodyView.setText("N/A");
         }
     }
@@ -253,6 +249,7 @@ public class ArticleDetailFragment extends Fragment implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+
         if (!isAdded()) {
             if (cursor != null) {
                 cursor.close();
@@ -261,8 +258,9 @@ public class ArticleDetailFragment extends Fragment implements
         }
 
         mCursor = cursor;
+        showSnackbar("Succesfully loaded data.");
+
         if (mCursor != null && !mCursor.moveToFirst()) {
-            Log.e(TAG, "Error reading item detail cursor");
             mCursor.close();
             mCursor = null;
         }
@@ -307,6 +305,22 @@ public class ArticleDetailFragment extends Fragment implements
         Rect containerBounds = new Rect();
         container.getHitRect(containerBounds);
         return view.getLocalVisibleRect(containerBounds);
+    }
+
+    public void showSnackbar(String message) {
+        final Snackbar snackbar = Snackbar.make(
+                mRootView.findViewById(R.id.draw_insets_frame_layout),
+                message,
+                Snackbar.LENGTH_SHORT);
+
+        snackbar.setAction("DISMISS", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                snackbar.dismiss();
+            }
+        });
+
+        snackbar.show();
     }
 
 }

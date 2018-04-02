@@ -95,7 +95,7 @@ public class ArticleDetailActivity extends AppCompatActivity
                 mStartId = ItemsContract.Items.getItemId(getIntent().getData());
             }
             mCurrentPosition = mStartingPosition;
-        }else{
+        } else {
             mStartId = savedInstanceState.getLong(ARTICLE_ID);
             mCurrentPosition = savedInstanceState.getInt(EXTRA_CURRENT_ARTICLE_POSITION);
         }
@@ -108,9 +108,15 @@ public class ArticleDetailActivity extends AppCompatActivity
         mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                if (mCursor != null) {
+                if (mCursor != null && position < -1) {
+                    int pageWidth = mPager.getWidth();
                     mCursor.moveToPosition(position);
                     mCurrentPosition = position;
+                    if (position < -1) {
+                        mPager.setAlpha(0);
+                    } else if (position <= 1) {
+                        mPager.setTranslationX(-position * (pageWidth / 2));
+                    } else mPager.setAlpha(0);
                 }
             }
         });

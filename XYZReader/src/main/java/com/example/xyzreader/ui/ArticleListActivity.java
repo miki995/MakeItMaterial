@@ -221,6 +221,7 @@ public class ArticleListActivity extends AppCompatActivity implements
         }
     }
 
+
     public static boolean getmIsDetailsActivityStarted(){
         return mIsDetailsActivityStarted;
     }
